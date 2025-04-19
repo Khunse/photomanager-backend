@@ -32,7 +32,7 @@ namespace imageuploadandmanagementsystem.Service.ImageService
             _imageRepository = imageRepository;
         }
 
-        public async Task<List<Image>> GenerateTempUploadLinkAsync(string userEmail,List<string> fileNames)
+        public async Task<List<Image>> GenerateTempUploadLinkAsync(string userEmail,List<Image> fileNames)
         {
             var presignUrls = new List<Image>();
 
@@ -49,16 +49,16 @@ namespace imageuploadandmanagementsystem.Service.ImageService
             
             foreach(var filename in fileNames)
             {
-                var isImageExist = await _imageRepository.CheckImageExistAsync(userEmail,filename);
+                var isImageExist = await _imageRepository.CheckImageExistAsync(userEmail,filename.name);
                 string? imgName;
                 if (isImageExist)
                 {
-                    var imgCount = await _imageRepository.ImageCountAsync(userEmail,filename);
-                    imgName = $"{filename}_{imgCount}";
+                    var imgCount = await _imageRepository.ImageCountAsync(userEmail,filename.name);
+                    imgName = $"{filename.name}_{imgCount}";
                 }
                 else
                 {
-                    imgName = filename;
+                    imgName = filename.name;
                 }
             var request = new GetPreSignedUrlRequest
             {
@@ -66,20 +66,21 @@ namespace imageuploadandmanagementsystem.Service.ImageService
                 Key = $"{userEmail}/{imgName}",
                 Expires = DateTime.UtcNow.AddMinutes(5),
                 Verb = HttpVerb.PUT,
-                ContentType = "image/png"
+                ContentType = filename.imgType,
             };
 
             var tmpurl =  await _s3Client.GetPreSignedURLAsync(request);
 
             var imgUrl = new Image(
-                filename,
+                filename.name,
                 "",
                 "",
-                tmpurl
+                tmpurl,
+                filename.imgType
             );
             presignUrls.Add(imgUrl);
 
-              if( ! await _imageRepository.SaveImageMetaDataAsync(userEmail,imgName))
+              if( ! await _imageRepository.SaveImageMetaDataAsync(userEmail,imgName,filename.imgType))
             {
                 Console.Error.WriteLine("ERROR :: Fail to save image metadata to Database!!!");
             }
@@ -134,7 +135,8 @@ namespace imageuploadandmanagementsystem.Service.ImageService
                             img.ImageName,
                             img.Description,
                             "",
-                            imgUrl
+                            imgUrl,
+                            img.ImageType
                             )
                             );
                 }
@@ -158,17 +160,18 @@ namespace imageuploadandmanagementsystem.Service.ImageService
             return isDeletedFromDB;
         }
 
-        public async Task<List<Image>> GenerateTempGetLinkAsync(string userEmail, List<string> fileNames)
+        public async Task<List<Image>> GenerateTempGetLinkAsync(string userEmail, List<Image> fileNames)
         {
             var presignUrls = new List<Image>();
 
             foreach(var filename in fileNames)
             {
                 var imgUrl = new Image(
-                    filename,
+                    filename.name,
                     "",
                     "",
-                  await  GenerateTempImageUrlAsync(userEmail,filename)
+                  await  GenerateTempImageUrlAsync(userEmail,filename.name),
+                    filename.imgType
                 );
                 presignUrls.Add(imgUrl);
             }

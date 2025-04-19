@@ -63,7 +63,7 @@ namespace imageuploadandmanagementsystem.Data.Repository
             return await _context.Images.CountAsync(x => x.UserId.Equals(userInfo.UserId) && x.ImageName.Equals(imageName));
         }
 
-        public async Task<bool> SaveImageMetaDataAsync(string userEmail, string imageName)
+        public async Task<bool> SaveImageMetaDataAsync(string userEmail, string imageName, string imageType)
         {
             var userInfo = await _context.Users.FirstOrDefaultAsync(x => x.Email.Equals(userEmail));
 
@@ -76,6 +76,7 @@ namespace imageuploadandmanagementsystem.Data.Repository
                 {
                     UserId = userInfo.UserId,
                     ImageName = imageName,
+                    ImageType = imageType,
                     Description = string.Empty,
                     Created_At = DateTime.UtcNow
                 });

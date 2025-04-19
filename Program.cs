@@ -141,7 +141,7 @@ app.MapPost("/images/delete",[Authorize] async(RequestModel<ImageRequestModel> r
         return Results.BadRequest("No images to delete");
     }
 
-    var isDeleted = await imageService.DeleteImagesAsync(userEmail, req.Req.imageUrls);
+    var isDeleted = await imageService.DeleteImagesAsync(userEmail, req.Req.imageUrls.Select(x => x.name).ToList());
     return Results.Ok(isDeleted);
 });
 

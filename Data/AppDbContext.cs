@@ -23,6 +23,7 @@ namespace imageuploadandmanagementsystem.Data
         public int Id { get; set; }
         public string UserId { get; set; } = null!;
         public string ImageName { get; set; } = null!;
+        public string ImageType { get; set; } = null!;
         public string Description { get; set; } = null!;
         public DateTime Created_At {get; set;}
     }
