@@ -39,7 +39,7 @@ dotnet ef database update
 dotnet publish -c Release -o ./publish
 
 sudo mv /tmp/myapp.service /etc/systemd/system/
-sudo mv /tmp/myapp.conf /etc/nignx/conf.d/
+sudo mv /tmp/myapp.conf /etc/nginx/conf.d/
 
 sudo systemctl start myapp.service
 sudo systemctl enable myapp.service
