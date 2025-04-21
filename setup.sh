@@ -24,10 +24,10 @@ sudo systemctl start postgresql
 sudo systemctl enable postgresql
 
 sudo -u postgres psql -f /tmp/my_init.sql
-sudo certbot --nginx -d api.photomanager.site
+sudo certbot certonly --nginx -d api.photomanager.site
 
 sudo git clone https://github.com/Khunse/photomanager-backend.git
-sudo chown ubunt:ubuntu -R $HOME/photomanager-backend
+sudo chown ubuntu:ubuntu -R $HOME/photomanager-backend
 cd $HOME/photomanager-backend
 
 export JWT_KEY=lajdkf
