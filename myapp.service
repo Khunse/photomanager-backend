@@ -7,9 +7,9 @@ WorkingDirectory=/home/ubuntu/photomanager-backend
 ExecStart=/home/ubuntu/dotnet-9-sdk/dotnet /home/ubuntu/photomanager-backend/publish/imageuploadandmanagementsystem.dll
 Restart=always
 Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=AWS_ACCESS_KEY_ID=
-Environment=AWS_SECRET_ACCESS_KEY=
-Environment=JWT_KEY=
+Environment=AWS_ACCESS_KEY_ID=adf
+Environment=AWS_SECRET_ACCESS_KEY=daf
+Environment=JWT_KEY=daf
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=photomanagersiteapp

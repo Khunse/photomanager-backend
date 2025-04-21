@@ -16,7 +16,9 @@ export PATH=$PATH:$HOME/.dotnet/tools
 sudo apt-get install -y nginx
 sudo apt-get install -y postgresql postgresql-contrib
 sudo apt-get install -y certbot
-sudo apt-get install -y python3-nginx-certbot 
+sudo apt-get install -y python3-certbot-nginx
+
+sudo systemctl stop nginx
 
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
@@ -25,8 +27,13 @@ sudo -u postgres psql -f /tmp/my_init.sql
 sudo certbot --nginx -d api.photomanager.site
 
 sudo git clone https://github.com/Khunse/photomanager-backend.git
-sudo chow ubunt:ubuntu -R $HOME/photomanager-backend
+sudo chown ubunt:ubuntu -R $HOME/photomanager-backend
 cd $HOME/photomanager-backend
+
+export JWT_KEY=lajdkf
+export AWS_ACCESS_KEY_ID=kadjlfd
+export AWS_SECRET_ACCESS_KEY=dajlfkjd
+
 dotnet ef migrations add 'create table'
 dotnet ef database update
 dotnet publish -c Release -o ./publish
