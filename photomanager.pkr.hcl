@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "photomanagerapi" {
-  ami_name      = "my_phtomanagerapi_aws_ami_2"
+  ami_name      = "my_phtomanagerapi_aws_ami_3"
   instance_type = "t2.micro"
   region        = "ap-southeast-1"
 
