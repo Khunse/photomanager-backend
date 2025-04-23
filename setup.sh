@@ -24,7 +24,7 @@ sudo systemctl start postgresql
 sudo systemctl enable postgresql
 
 sudo -u postgres psql -f /tmp/my_init.sql
-sudo certbot certonly --nginx -d api.photomanager.site
+# sudo certbot certonly --nginx --non-interactive --agree-tos --redirect --email louisgin32@gmail.com -d api.photomanager.site
 
 sudo git clone https://github.com/Khunse/photomanager-backend.git
 sudo chown ubuntu:ubuntu -R $HOME/photomanager-backend
@@ -39,10 +39,11 @@ dotnet ef database update
 dotnet publish -c Release -o ./publish
 
 sudo mv /tmp/myapp.service /etc/systemd/system/
-sudo mv /tmp/myapp.conf /etc/nginx/conf.d/
+sudo mv /tmp/myapp.conf $HOME/
 
 sudo systemctl start myapp.service
 sudo systemctl enable myapp.service
 
-sudo systemctl start nginx
-sudo systemctl enable nginx
+# sudo systemctl stop nginx
+# sudo systemctl start nginx
+# sudo systemctl enable nginx
