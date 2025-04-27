@@ -7,7 +7,12 @@ namespace imageuploadandmanagementsystem.Common
             var requiredVariables = new List<string>{
                 "AWS_ACCESS_KEY_ID",
                 "AWS_SECRET_ACCESS_KEY",
-                "JWT_KEY"
+                "JWT_KEY",
+                "DB_HOST_NAME",
+                "DB_PORT",
+                "DB_NAME",
+                "DB_USER_NAME",
+                "DB_USER_PASSWORD",
             };
 
             var missingVariables = requiredVariables.Where(variable => string.IsNullOrEmpty(Environment.GetEnvironmentVariable(variable))).ToList();

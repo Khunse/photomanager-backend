@@ -36,14 +36,14 @@ resource "aws_route53_record" "photomanager_api_domain" {
 
 
 resource "aws_instance" "photomanager_backend" {
-  ami                    = "ami-04d5959246ae9f7ed"
+  ami                    = "ami-0d4f4e05e32c5ccbf"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.photomanager_backend_SG.id]
   tags = {
     Name = var.photomanager_backend_instance_name
   }
 
-  user_data = file("D:\\New folder (6)\\imageuploadandmanagementsystem\\photomanager_backend_config.sh")
+  user_data = file("photomanager_backend_config.sh")
 }
 
 resource "aws_security_group" "photomanager_backend_SG" {

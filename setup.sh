@@ -14,16 +14,16 @@ export PATH=$PATH:$HOME/dotnet-9-sdk
 export PATH=$PATH:$HOME/.dotnet/tools
 
 sudo apt-get install -y nginx
-sudo apt-get install -y postgresql postgresql-contrib
+# sudo apt-get install -y postgresql postgresql-contrib
 sudo apt-get install -y certbot
 sudo apt-get install -y python3-certbot-nginx
 
 sudo systemctl stop nginx
 
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
+# sudo systemctl start postgresql
+# sudo systemctl enable postgresql
 
-sudo -u postgres psql -f /tmp/my_init.sql
+# sudo -u postgres psql -f /tmp/my_init.sql
 # sudo certbot certonly --nginx --non-interactive --agree-tos --redirect --email louisgin32@gmail.com -d api.photomanager.site
 
 sudo git clone https://github.com/Khunse/photomanager-backend.git
@@ -34,8 +34,8 @@ export JWT_KEY=lajdkf
 export AWS_ACCESS_KEY_ID=kadjlfd
 export AWS_SECRET_ACCESS_KEY=dajlfkjd
 
-dotnet ef migrations add 'create table'
-dotnet ef database update
+# dotnet ef migrations add 'create table'
+# dotnet ef database update
 dotnet publish -c Release -o ./publish
 
 sudo mv /tmp/myapp.service /etc/systemd/system/

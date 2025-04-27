@@ -21,6 +21,13 @@ var jwtParameters = builder.Configuration.GetSection("JWTParameters");
 var corsPolicyName = "AllowAllOrigins";
 var allowedOrgins = builder.Configuration.GetSection("Origins:AllowedOrigins").Get<string[]>() ?? [];
 
+var dbhostname = Environment.GetEnvironmentVariable("DB_HOST_NAME");
+var dbPort = Environment.GetEnvironmentVariable("DB_PORT");
+var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+var dbUserName = Environment.GetEnvironmentVariable("DB_USER_NAME");
+var dbUserPassword = Environment.GetEnvironmentVariable("DB_USER_PASSWORD");
+var connectionString = $"Server={dbhostname};Port={dbPort};Database={dbName};User Id={dbUserName};Password={dbUserPassword}";
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -55,7 +62,7 @@ builder.Services
         });
 
 builder.Services.AddDbContext<AppDbContext>(opt => {
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseNpgsql(connectionString);
 });
 builder.Services.AddAuthorization();
 
