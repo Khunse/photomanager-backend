@@ -20,15 +20,16 @@ namespace imageuploadandmanagementsystem.Service.ImageService
             var useLocalStack = bool.Parse(awsConfig["UseLocalStack"] ?? "false");
             _bucketName = awsConfig["BucketName"] ?? throw new ArgumentNullException("AWS_BUCKET_NAME");
 
-            var awss3config = new AmazonS3Config{
-                ServiceURL = awsServiceUrl,
-                RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(awsRegion),
-                ForcePathStyle = useLocalStack,
-            };
+            // var awss3config = new AmazonS3Config{
+            //     ServiceURL = awsServiceUrl,
+            //     RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(awsRegion),
+            //     ForcePathStyle = useLocalStack,
+            // };
 
-            if(!string.IsNullOrEmpty(awsServiceUrl)) awss3config.ServiceURL = awsServiceUrl;
+            // if(!string.IsNullOrEmpty(awsServiceUrl)) awss3config.ServiceURL = awsServiceUrl;
 
-            _s3Client = new AmazonS3Client(awsAccessKey,awsSecretKey,awss3config);
+            // _s3Client = new AmazonS3Client(awsAccessKey,awsSecretKey,awss3config);
+            _s3Client = new AmazonS3Client();
             _imageRepository = imageRepository;
         }
 
@@ -36,16 +37,17 @@ namespace imageuploadandmanagementsystem.Service.ImageService
         {
             var presignUrls = new List<Image>();
 
-            var isBucketExist = await _s3Client.DoesS3BucketExistAsync(_bucketName);
-            if (!isBucketExist)
-            {
-                var bucketRequest = new PutBucketRequest
-                {
-                    BucketName = _bucketName,
-                    UseClientRegion = true
-                };
-                await _s3Client.PutBucketAsync(bucketRequest);
-            }
+            // var isBucketExist =
+            await _s3Client.EnsureBucketExistsAsync(_bucketName);
+            // if (!isBucketExist)
+            // {
+            //     var bucketRequest = new PutBucketRequest
+            //     {
+            //         BucketName = _bucketName,
+            //         UseClientRegion = true
+            //     };
+            //     await _s3Client.PutBucketAsync(bucketRequest);
+            // }
             
             foreach(var filename in fileNames)
             {

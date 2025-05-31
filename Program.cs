@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using System.Text;
+using Amazon.Runtime.SharedInterfaces;
 using Amazon.S3;
 using imageuploadandmanagementsystem.Common;
 using imageuploadandmanagementsystem.Common.Extension;
 using imageuploadandmanagementsystem.Data;
 using imageuploadandmanagementsystem.Data.Repository;
 using imageuploadandmanagementsystem.Model;
-using imageuploadandmanagementsystem.Service.Authentication;
 using imageuploadandmanagementsystem.Service.ImageService;
 using imageuploadandmanagementsystem.Service.UserService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,7 +30,11 @@ var connectionString = $"Server={dbhostname};Port={dbPort};Database={dbName};Use
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// builder.Services.AddOpenApi();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 builder.Services.AddCors(
     options =>
@@ -44,6 +48,8 @@ builder.Services.AddCors(
             });
     }
 );
+
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 
 builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -61,25 +67,44 @@ builder.Services
             };
         });
 
-builder.Services.AddDbContext<AppDbContext>(opt => {
-    opt.UseNpgsql(connectionString);
-});
+
+if(builder.Environment.IsDevelopment())
+{
+        builder.Services.AddDbContext<AppDbContext>(opt => {
+            opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+        });
+}
+else
+{
+    builder.Services.AddDbContext<AppDbContext>(opt => {
+        opt.UseNpgsql(connectionString);
+    });
+}
+
 builder.Services.AddAuthorization();
 
-builder.Services.AddAWSService<IAmazonS3>();
-builder.Services.AddScoped<IAuthenticationService, JWTAuthenticationService>();
+// builder.Services.AddAWSService<IAmazonS3>();
+// builder.Services.AddScoped<IAuthenticationService, JWTAuthenticationService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IUserService,UserService>();
 
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<IImageRepository,ImageRepository>();
 
+// builder.Services.AddHttpClient<JWTAuthenticationService>( (serviceProvider, httpClient) => {
+
+//     // var jwtService = serviceProvider.GetRequiredService<JWTAuthenticationService>();
+    
+//     // httpClient.BaseAddress = new Uri("https://www.googleapis.com/oauth2/v3/userinfo")
+//     httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+// });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    // app.MapOpenApi();
 }
 
 app.UseCors(corsPolicyName);
@@ -88,21 +113,47 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/health", () => Results.Ok("Healthy!"));
 
-app.MapPost("/register", (RequestModel<RegisterRequest> request, IUserService userService) =>
+// app.MapPost("/register", (RequestModel<RegisterRequest> request, IUserService userService) =>
+// {
+//     if(!request.Req.ValidateRegisterRequestModel())
+//     {
+//         return Results.BadRequest("Invalid request");
+//     }
+//     var response =  userService.RegisterNewUser(request.Req.Email, request.Req.Password);
+
+//     return Results.Ok(response);
+// });
+
+// app.MapPost("/login", async (ILogger<Program> logger,LoginRequest request, IAuthenticationService authenticationService) =>
+// {
+//     try
+//     {
+//         logger.LogInformation("env data: dbconnection : {Request}", connectionString);
+//         logger.LogInformation("Login request received: {Request}", request);
+
+//         var response = await authenticationService.LoginAsync(request);
+
+//         logger.LogInformation("Login finished: {response}", response);
+//     return Results.Ok(response);
+//     }
+//     catch(Exception ex)
+//     {
+//         logger.LogError(ex, "Error validating login request model");
+//         return Results.BadRequest("Invalid request");
+//     }
+// });
+
+app.MapPost("/userinfo", [Authorize] async (UserRequest req, IUserService userService, HttpContext _context) =>
 {
-    if(!request.Req.ValidateRegisterRequestModel())
+    var userEmail = _context.User.FindFirst(ClaimTypes.Name)?.Value;
+    if (userEmail is null)
     {
-        return Results.BadRequest("Invalid request");
+        return Results.BadRequest("User Not Found!");
     }
-    var response =  userService.RegisterNewUser(request.Req.Email, request.Req.Password);
 
-    return Results.Ok(response);
-});
-
-app.MapPost("/login", async (LoginRequest request, IAuthenticationService authenticationService) =>
-{
-    var response = await authenticationService.LoginAsync(request);
+    var response = await userService.GetCurrentUserInfo(userEmail);
     return Results.Ok(response);
 });
 

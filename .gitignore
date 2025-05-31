@@ -498,3 +498,6 @@ override.tf
 override.tf.json
 
 *.log
+# Ignore Terraform workspace files
+.terraform.lock.hcl
+./myapp.service

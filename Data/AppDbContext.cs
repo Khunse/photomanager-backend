@@ -37,7 +37,9 @@ namespace imageuploadandmanagementsystem.Data
         public string Password { get; set; } = null!;
         public string SaltKey { get; set; } = null!;
         public string UserName { get; set; } = null!;
-        public DateTime Created_At {get; set;}
+        public bool IsSocialLogin { get; set; }
+        public int ProviderId { get; set; }
+        public DateTime Created_At { get; set; }
         public DateTime? Updated_At {get; set;}
         public bool Is_Active {get; set;}
     }
